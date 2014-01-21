@@ -108,10 +108,11 @@ class CTLT_Invite_User_Admin {
 		foreach( $this->my_invites as $invite ){
 			echo "<div style='border-top:1px solid #EEE; margin:10px -12px 0; padding:0 12px;'><p>";
 			switch_to_blog( $invite['blog_id'] );
+			$site_url = site_url();
+			$join_url 	 = $site_url.'?action=invite_me&hash='.$invite['hash'];
+			$decline_url = $site_url.'?action=decline_invite&hash='.$invite['hash'];
 			
-			$join_url 	 = site_url().'?action=invite_me&hash='.$invite['hash'],
-			$decline_url = site_url().'?action=decline_invite&hash='.$invite['hash'], 
-			echo "<strong><a href='".site_url()."'>".get_bloginfo('name')."</strong></a> as <em>".$invite['role']."</em></p>" ; 
+			echo "<strong><a href='".$site_url."'>".get_bloginfo( 'name' )."</strong></a> as <em>".$invite['role']."</em></p>" ; 
 			echo "<p><a href='".$join_url."' class='button button-primary'>Accept Invite</a> or <a href='".$decline_url."' >Decline</a>";
 			
 			restore_current_blog();

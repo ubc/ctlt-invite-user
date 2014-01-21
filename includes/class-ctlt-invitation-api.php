@@ -66,8 +66,8 @@ class CTLT_Invitation_API{
 		if( $blog_id == null)
 			$blog_id = get_current_blog_id();
 		
-		$type = (  in_array( $type, self::$instance->get_db_columns() ) ? $type : "hash" );$
-		$value_type = ( is_int( $value ) ? '%d' : '%s' );
+		$type = (  in_array( $type, self::$instance->get_db_columns() ) ? $type : "hash" );
+		$value_type = ( is_numeric ( $value ) ? "%d" : "%s" );
 		
 		if( $status  == 'ANY') {
 			$sql =  $wpdb->prepare( "SELECT * FROM ".$wpdb->base_prefix .self::DB_TABLE." WHERE ".$type."=".$value_type." AND blog_id=%d", $value, $blog_id );
@@ -99,7 +99,6 @@ class CTLT_Invitation_API{
 		} else {
 			$sql = $wpdb->prepare( "SELECT * FROM ".$wpdb->base_prefix .self::DB_TABLE." WHERE ".$type."=".$value_type." AND status=%s ", $value, $status );
 		}
-		
 		
 		return $wpdb->get_results( $sql, ARRAY_A );
 	}
@@ -206,13 +205,13 @@ class CTLT_Invitation_API{
 
 		global $wpdb;
 		
-		$status = (int)$status;
+		$status = (int) $status;
 		
 		$sql = $wpdb->prepare("
 			UPDATE ".$wpdb->base_prefix .self::DB_TABLE." 
 			SET status = %d
 			WHERE hash = %s 
-			", $status, 
+			", $status );
 		return $wpdb->query( $sql );
 
 	}

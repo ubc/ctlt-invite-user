@@ -78,7 +78,7 @@ class CTLT_Invite_User {
 		$redirect_url = false;
 		
 		# doesn't pass the first check
-		if( ! (isset( $_GET['action'] ) && ( in_array( $_GET['action'], array( 'decline_invite', 'invite_me') && isset( $_GET['hash'] ) ) )
+		if( ! ( isset( $_GET['action'] ) && in_array( $_GET['action'], array( 'decline_invite', 'invite_me' ) ) && isset( $_GET['hash'] ) ) )
 			return;
 			
 		$privacy = get_option( 'blog_public' );
@@ -90,6 +90,7 @@ class CTLT_Invite_User {
 		$invite_api = CTLT_Invitation_API::get_instance();
 		
 		$hash = $invite_api->get_invite_by( 'hash', $_GET['hash'], "ANY" );
+		
 		
 		$end_menu = "<p>Continue to visit the <a href='".$site_url."'>Site</a> or <a href='".$site_dash."'>Dashboard</a></p>";
 		
@@ -131,20 +132,20 @@ class CTLT_Invite_User {
 			if( is_user_member_of_blog( $c_user->ID, $blog_id ) ){
 				// do nothing they are already here. 
 				# but maybe inform them that they 
-				wp_die( $accepted. "<p>".$c_user->display_name." are already a member of <strong><a href='".$site_url."'>".$site_name."</a>. </strong> </p>".$end_menu    ); 
+				wp_die( $accepted. "<p>".$c_user->display_name." is already a member of <strong><a href='".$site_url."'>".$site_name."</a>. </strong> </p>".$end_menu    ); 
 			} else {
 				
 				
 				switch( $_GET['action'] ){
 					case 'invite_me':
 						# add the user to blog with role
-						add_user_to_blog( $blog_id, $user_id, $hash['role'] );
+						add_user_to_blog( $blog_id, $c_user->ID, $hash['role'] );
 						
 						#update the invite db
 						$invite_api->update_status( $hash['hash'], 1 ); #confirmed
 						#message 
 						wp_die("<p><big>Welcome ".$c_user->display_name."</big>
-				<br />You have been just added to <strong><a href='".$site_url."'>".$site_name."</a></strong></p>".$end_menu   ); 
+				<br />You have been just joined to <strong><a href='".$site_url."'>".$site_name."</a></strong> as ".$hash['role'].".</p>".$end_menu   ); 
 						
 						
 					break;
