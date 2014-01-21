@@ -13,11 +13,11 @@
  *
  * @wordpress-plugin
  * Plugin Name:       CTLT Invite Users
- * Plugin URI:        @TODO
+ * Plugin URI:        http://github.com/ubc/ctlt-invite-user
  * Description:       @TODO
  * Version:           1.0.0
  * Author:            Enej Bajgoric
- * Author URI:        @TODO
+ * Author URI:        http://cms.ubc.ca
  * Text Domain:       ctlt-invite-user-locale
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
