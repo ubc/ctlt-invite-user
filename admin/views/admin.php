@@ -61,6 +61,20 @@
 					</fieldset>
 				</td>
 			</tr>
+			
+			<?php 
+			$super_admin_message = get_site_option( 'ctlt_invite_email' );
+			if( !empty( $super_admin_message ) && is_super_admin() ) { ?>
+			<tr valign="top">
+				<th scope="row">Appended Message <a href="<?php echo network_admin_url("settings.php#ctlt_invite_email"); ?>" title="Edit appended invite message">Edit</a></th>
+				<td >
+					<?php echo nl2br ( $super_admin_message ); ?>
+					
+				</td>
+			</tr>
+			
+			<?php } ?>
+			
 			<tr valign="top">
 				<th scope="row"></th>
 				<td >

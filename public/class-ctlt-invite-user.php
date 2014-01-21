@@ -161,14 +161,18 @@ class CTLT_Invite_User {
 			$c_user =  wp_get_current_user();
 			$blog_id = get_current_blog_id();
 			
-			if( is_user_member_of_blog( $c_user->ID, $blog_id ) ){
+			if( is_user_member_of_blog( $c_user->ID, $blog_id ) ) {
+				
 				// do nothing they are already here. 
 				# but maybe inform them that they 
 				$this->wp_die( $accepted. "<p><em>". ucfirst( $c_user->display_name ) ."</em> is already a member of <strong><a href='".$site_url."'>".$site_name."</a>. </strong> </p>".$end_menu, 'Already a member of '.$site_name    ); 
+				
+				
 			} else {
 				
 				
 				switch( $_GET['action'] ){
+				
 					case 'invite_me':
 						
 						# add the user to blog with role
@@ -191,21 +195,12 @@ class CTLT_Invite_User {
 						$this->wp_die("<p><big>Hi ".$c_user->display_name."</big>
 					<br />You declined your invitation to <strong><a href='".$site_url."'>".$site_name."</a></strong></p>", 'Declined Invitation'  ); 
 						
-						
 					break;
-				
-				}
-		
-				# tell the user 
-				# add the suer o
-				add_user_to_blog( $blog_id, $user_id, $hash['role'] );
-				wp_redirect( site_url() );
-				
-				$this->wp_die("<p><big>Welcome ".$c_user->display_name."</big>
-				<br />You have been just added to <strong><a href='".$site_url."'>".$site_name."</a></strong></p>".$end_menu   ); 
-			}
+				} // end of switch
+			} // end of member not part of blog
 
 		} else {
+			
 			# user needs to login first before we can add them
 			wp_redirect( wp_login_url( site_url( '?action=invite_me&hash='.$_GET['hash'] ) ) );
 		}

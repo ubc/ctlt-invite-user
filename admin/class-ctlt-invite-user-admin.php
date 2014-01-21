@@ -67,6 +67,9 @@ class CTLT_Invite_User_Admin {
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 		
 		add_action( 'admin_init', array( $this , 'redirect_add_user' ) );
+		
+		add_action( 'wpmu_options', array( $this, 'display_wpmu_options'), 1 );
+		add_action( 'update_wpmu_options', array( $this, 'update_wpmu_options' ) );
 	}
 	
 	/**
@@ -419,7 +422,8 @@ class CTLT_Invite_User_Admin {
 		
 		$invited_by_user = get_user_by( "id", $invite['inviter_id'] );
 		$invited_by = $invited_by_user->display_name;
-		$message = $this->construct_email( '', $invited_by, $role, $hash );
+		$admin_message = get_site_option(  'ctlt_invite_email' );
+		$message = $this->construct_email( '', $admin_message,  $invited_by, $role, $hash );
 
 		# send email
 		$subject = $this->get_email_subject( $invited_by, $role, get_bloginfo( 'name' ) );
@@ -488,7 +492,7 @@ class CTLT_Invite_User_Admin {
 	 * @param string $role role for which they were invited for
 	 * @return string $message - the email that will be send out the the users
 	 */
-	public function construct_email( $raw_message = '',  $invited_by , $role, $hash ) {
+	public function construct_email( $raw_message = '', $raw_admin_message,  $invited_by , $role, $hash ) {
 
 		$allows_html = array(
 		    'a' => array(
@@ -501,20 +505,22 @@ class CTLT_Invite_User_Admin {
 		    'p'	=> array()
 		);
 		# load the template
-		$user_message = wp_kses( $raw_message,  $allows_html );
+		$user_message = wp_kses( nl2br( $raw_message ) ,  $allows_html );
+		$admin_message = wp_kses( nl2br( $raw_admin_message ),  $allows_html );
 		
 		$template  = file_get_contents( realpath( dirname(__FILE__) ).'/views/email.html', true );
 		$blog_name = get_bloginfo( 'name' );
 		
 		$replace = array(
-			'%email_subject%' => $this->get_email_subject( $invited_by, $role, $blog_name ),
-			'%invited_by%' => $invited_by,
-			'%role_job%' => $this->role_job_text( $role ),
-			'%blog_url%' => site_url() ,
-			'%blog_name%' => $blog_name,
+			'%email_subject%' 	=> $this->get_email_subject( $invited_by, $role, $blog_name ),
+			'%invited_by%' 		=> $invited_by,
+			'%role_job%' 		=> $this->role_job_text( $role ),
+			'%blog_url%' 		=> site_url() ,
+			'%blog_name%' 		=> $blog_name,
 			'%role_permission%' => $this->role_permission_text( $role ),
-			'%user_message%' => $user_message,
-			'%invitation_url%' => site_url().'?action=invite_me&hash='.$hash,
+			'%user_message%' 	=> $user_message,
+			'%invitation_url%' 	=> site_url().'?action=invite_me&hash='.$hash,
+			'%admin_message%'	=> $admin_message
 			);
 		# replace strings. 
 		$message = str_replace(array_keys($replace), array_values($replace), $template);
@@ -599,6 +605,7 @@ class CTLT_Invite_User_Admin {
 		}
 
 	}
+	
 	/**
 	 * parses out email addresses from the string
 	 * @param  string $raw_emails
@@ -628,7 +635,50 @@ class CTLT_Invite_User_Admin {
 		return $emails;
 		
    }
-
+   
+   /**
+    * display_wpmu_options function.
+    * Displays options in the network settings page
+    * @access public
+    * @return void
+    */
+   public function display_wpmu_options(){	
+   
+   ?>
+   <h3><?php _e( 'Invite User Message', 'ctlt-invite-user'  ); ?></h3>
+   	<table class="form-table">
+		<tr valign="top">
+			<th scope="row"><label for="ctlt_invite_email"><?php _e( 'Invite Email', 'ctlt-invite-user' ) ?></label></th>
+			<td>
+				<textarea name="ctlt_invite_email" id="ctlt_invite_email" rows="5" cols="45" class="large-text"><?php echo esc_textarea( get_site_option( 'ctlt_invite_email' ) ) ?></textarea>
+				<p class="description">
+					<?php _e( 'Explain to your user what the process of being added to the site. This message will be added at the end of the email.', 'ctlt-invite-user' ); ?>
+				</p>	
+			</td>
+		</tr>
+	</table>
+   	<?php
+   }
+   
+   /**
+    * update_wpmu_options function.
+    * 
+    * @access public
+    * @return void
+    */
+   	public function update_wpmu_options() {
+   		
+   		// process that is involved in getting the account 
+   		update_site_option( 'ctlt_invite_email', wp_unslash( $_POST['ctlt_invite_email'] ) );
+   		
+   	}
+	
+	/**
+	 * set_html_content_type function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function set_html_content_type() {
 		return 'text/html';
 	}

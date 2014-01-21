@@ -1,5 +1,5 @@
 
-Contributors: enej, 
+Contributors: enej, ubcdev, ctlt-dev
 Donate link: http://cms.ubc.ca/
 Tags: comments, spam
 Requires at least: 3.5.1
@@ -44,4 +44,11 @@ e.g.
 
 
 == Future Work ==
-* support for more roles
+* Support for more roles
+* Tell you what user has signed up and when
+* Translation Ready
+
+== Screenshots ==
+
+1. Admin area where administrators can invite useres
+2. If the user doesn't get an email there is a dashboard widget showing them pending invitations
