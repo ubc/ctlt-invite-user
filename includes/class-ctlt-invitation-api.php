@@ -211,7 +211,9 @@ class CTLT_Invitation_API{
 			UPDATE ".$wpdb->base_prefix .self::DB_TABLE." 
 			SET status = %d
 			WHERE hash = %s 
-			", $status );
+			", $status, $hash );
+			
+			
 		return $wpdb->query( $sql );
 
 	}
@@ -226,6 +228,12 @@ class CTLT_Invitation_API{
 		return $wpdb->delete( $wpdb->base_prefix .self::DB_TABLE , array( 'id' => $id, 'blog_id' => $blog_id ), array( '%d', '%d' )  );
 
 	}
+	public function delete_invite_user_from_blog( $user_id, $blog_id ) {
+		global $wpdb;
+		$blog_id = get_current_blog_id();
+		return $wpdb->delete( $wpdb->base_prefix .self::DB_TABLE , array( 'id' => $id, 'blog_id' => $blog_id ), array( '%d', '%d' )  );
+
+	} 
 	/**
 	 * Delete multiple ids
 	 * @param  array $ids array of invite ids

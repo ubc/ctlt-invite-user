@@ -91,8 +91,7 @@ class CTLT_Invite_User {
 		
 		$hash = $invite_api->get_invite_by( 'hash', $_GET['hash'], "ANY" );
 		
-		
-		$end_menu = "<p>Continue to visit the <a href='".$site_url."'>Site</a> or <a href='".$site_dash."'>Dashboard</a></p>";
+		$end_menu = "<p>Continue to the <a href='".$site_url."'>Site</a> or <a href='".$site_dash."'>Dashboard</a>.</p>";
 		
 		if( $privacy < 0 )
 			$end_private = "";
@@ -107,18 +106,18 @@ class CTLT_Invite_User {
 				# show error but let them continou to the site. instead
 		}
 		
-		if( $hash['status'] == 2) {
+		if( $hash['status'] == '2') {
 			wp_die( "<p class='error'>Your invitation has expired!</p>".$end_private ); 
 			# show error but let them continou to the site. instead
 		}
 		
-		if( $hash['status'] == 3) {
+		if( $hash['status'] == '3') {
 			wp_die( "<p class='error'>Your invitation has been canceled!</p>".$end_private  ); 
 			# show error but let them continou to the site. instead
 		}
 		
 		$accepted = '';
-		if( $hash['status'] == 1) {
+		if( $hash['status'] == '1') {
 			$accepted = "<p>Your invitation was already accepted!</p>"; 
 			# show error but let them continou to the site. instead
 		}
@@ -132,7 +131,7 @@ class CTLT_Invite_User {
 			if( is_user_member_of_blog( $c_user->ID, $blog_id ) ){
 				// do nothing they are already here. 
 				# but maybe inform them that they 
-				wp_die( $accepted. "<p>".$c_user->display_name." is already a member of <strong><a href='".$site_url."'>".$site_name."</a>. </strong> </p>".$end_menu    ); 
+				wp_die( $accepted. "<p><em>". ucfirst( $c_user->display_name ) ."</em> is already a member of <strong><a href='".$site_url."'>".$site_name."</a>. </strong> </p>".$end_menu    ); 
 			} else {
 				
 				
@@ -142,9 +141,9 @@ class CTLT_Invite_User {
 						add_user_to_blog( $blog_id, $c_user->ID, $hash['role'] );
 						
 						#update the invite db
-						$invite_api->update_status( $hash['hash'], 1 ); #confirmed
+						
 						#message 
-						wp_die("<p><big>Welcome ".$c_user->display_name."</big>
+						wp_die( $accepted. "<p><big>Welcome ".$c_user->display_name."</big>
 				<br />You have been just joined to <strong><a href='".$site_url."'>".$site_name."</a></strong> as ".$hash['role'].".</p>".$end_menu   ); 
 						
 						
@@ -153,8 +152,8 @@ class CTLT_Invite_User {
 					
 						# update the invite db
 						$invite_api->update_status( $hash['hash'], 3 ); #rejected
-						wp_die("<p><big>Welcome ".$c_user->display_name."</big>
-				<br />You have been just added to <strong><a href='".$site_url."'>".$site_name."</a></strong></p>".$end_menu   ); 
+						wp_die("<p><big>Hi ".$c_user->display_name."</big>
+				<br />You declined your invitation <strong><a href='".$site_url."'>".$site_name."</a></strong></p>".$end_menu   ); 
 						
 						
 					break;

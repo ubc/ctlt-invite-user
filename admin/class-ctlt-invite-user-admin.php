@@ -69,6 +69,8 @@ class CTLT_Invite_User_Admin {
 		
 		add_action( 'admin_init', array( $this , 'redirect_add_user' ) );
 		
+		add_action( 'remove_user_from_blog' , array( $this, 'remove_user_from_blog' ) , 10, 2);
+		
 	}
 	
 	/**
@@ -244,6 +246,24 @@ class CTLT_Invite_User_Admin {
 		if( 'user-new.php' == $pagenow && !is_network_admin()  )
 			wp_redirect( 'users.php?page='.$this->plugin_slug );
 		
+	}
+	
+	
+	/**
+	 * remove_user_from_blog function.
+	 * This ensures that we delete the invite for that particular blog if we decide to remove the user once we have added them
+	 * @access public
+	 * @param mixed $user_id
+	 * @param mixed $blog_id
+	 * @return void
+	 */
+	public function remove_user_from_blog( $user_id, $blog_id ){
+		
+		
+		// remove the invite 
+		
+	
+	
 	}
 
 	/**
