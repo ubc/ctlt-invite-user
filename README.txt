@@ -41,3 +41,7 @@ e.g.
 2. Extract the `ctlt-invite-user` directory to your computer
 3. Upload the `ctlt-invite-user` directory to the `/wp-content/plugins/` directory
 4. Activate the plugin in the Plugin dashboard
+
+
+== Future Work ==
+* support for more roles

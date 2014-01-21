@@ -113,10 +113,16 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
         $nonce_resend = wp_create_nonce( 'resend_invite' );
         $nonce_delete = wp_create_nonce( 'delete_invite' );
         //Build row actions
+        
         $actions = array(
-            'resend'      => sprintf('<a href="?page=%s&action=%s&invite=%s&nonce=%s">Resend</a>', $_REQUEST['page'], 'resend', $item['id'] , $nonce_resend ),
+           
             'delete'    => sprintf('<a href="?page=%s&action=%s&invite=%s&nonce=%s">Delete</a>', $_REQUEST['page'], 'delete', $item['id'], $nonce_delete ),
         );
+        
+        if( $item['status'] == '0')
+        	$actions['resend'] = sprintf('<a href="?page=%s&action=%s&invite=%s&nonce=%s">Resend</a>', $_REQUEST['page'], 'resend', $item['id'] , $nonce_resend );
+        
+        
         
         //Return the title contents
         return sprintf('%1$s %2$s %3$s',
@@ -341,36 +347,6 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
         $invites_api = CTLT_Invitation_API::get_instance();
         $data = $invites_api->get_invites( $_REQUEST['orderby'], $_REQUEST['order'] );
         
-                
-        
-        /**
-         * This checks for sorting input and sorts the data in our array accordingly.
-         * 
-         * In a real-world situation involving a database, you would probably want 
-         * to handle sorting by passing the 'orderby' and 'order' values directly 
-         * to a custom query. The returned data will be pre-sorted, and this array
-         * sorting technique would be unnecessary.
-         */
-        function usort_reorder($a,$b){
-            $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'title'; //If no sort, default to title
-            $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
-            $result = strcmp($a[$orderby], $b[$orderby]); //Determine sort order
-            return ($order==='asc') ? $result : -$result; //Send final sort direction to usort
-        }
-        // usort($data, 'usort_reorder');
-        
-        
-        /***********************************************************************
-         * ---------------------------------------------------------------------
-         * vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-         * 
-         * In a real-world situation, this is where you would place your query.
-         * 
-         * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         * ---------------------------------------------------------------------
-         **********************************************************************/
-        
-                
         /**
          * REQUIRED for pagination. Let's figure out what page the user is currently 
          * looking at. We'll need this later, so you should always include it in 

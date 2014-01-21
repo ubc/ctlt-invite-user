@@ -49,7 +49,6 @@ class CTLT_Invite_User_Admin {
 		 * Call $plugin_slug from public plugin class.
 		 *
 		 */
-		
 		$plugin = CTLT_Invite_User::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 		
@@ -68,9 +67,6 @@ class CTLT_Invite_User_Admin {
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 		
 		add_action( 'admin_init', array( $this , 'redirect_add_user' ) );
-		
-		add_action( 'remove_user_from_blog' , array( $this, 'remove_user_from_blog' ) , 10, 2);
-		
 	}
 	
 	/**
@@ -400,15 +396,19 @@ class CTLT_Invite_User_Admin {
 
 		$invite_api = CTLT_Invitation_API::get_instance();
 		$invite = $invite_api->get_invite_by( 'id' , (int) $invite_id, "ANY" );
-
+		
+		$send_email = $invite['email'];
+		
+		
 		$role = $invite['role'];
 		$hash = $invite['hash'];
-		$send_email = $invite['email'];
-		if( STATUS_CONFIRMED == $invite['status'] ) 
-			return array( "error" => "Email to <strong>".$email. "</strong> wasn't send! they have already accepted the invitation");
 		
-		if( STATUS_REJECTED == $invite['status'] )
-			return array( "error" => "Email to <strong>".$email. "</strong> wasn't send! they have already accepted the invitation" );
+		// don't send invite if the user rejected the invite or accpeted it
+		if( "1" == $invite['status'] ) 
+			return array( "error" => "Email to <strong>".$send_email. "</strong> wasn't send! They have accepted the invitation already.");
+		
+		if( "3" == $invite['status'] )
+			return array( "error" => "Email to <strong>".$send_email. "</strong> wasn't send! They have rejected the invitation already." );
 	
 		$skip_db_check  = true;
 		$check_email = $this->check_email( $send_email, $role,  $skip_db_check ); 
@@ -457,10 +457,14 @@ class CTLT_Invite_User_Admin {
 		// check if the user is already member of the blog
 			# don't email them. notify the admin that they are already part of their blog.
 		$user = get_user_by( 'email', $email );
-		
-		if( $user->ID && is_user_member_of_blog( $user->ID, get_current_blog_id() ) ) // 
-			return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
-
+		if( function_exists( 'is_multisite' ) && is_multisite() ){
+			if( $user->ID && is_user_member_of_blog( $user->ID, get_current_blog_id() ) ) // 
+				return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
+		} else {
+			
+			if( $user->ID )
+				return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
+		}
 		if( $skip_db_check )
 			return "pass";
 		// check if the user already has in invitation

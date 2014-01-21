@@ -109,8 +109,9 @@ class CTLT_Invitation_API{
 	 * 
 	 */
 	public function get_invites( $order_by = 'timestamp' , $order = 'DESC' ){
-
+		
 		global $wpdb;
+		$order = strtoupper( $order );
 		$order_by = (  in_array($order_by, self::$instance->get_db_columns() ) ? $order_by : "timestamp" );
 		$order = ( in_array( $order, array( 'ASC', 'DESC' ) ) ? $order : 'DESC' );
 
