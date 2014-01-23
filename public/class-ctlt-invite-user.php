@@ -26,7 +26,9 @@ class CTLT_Invite_User {
 	 * @var     string
 	 */
 	const VERSION = '1.0.0';
-
+	
+	
+	
 	/**
 	 *
 	 * Unique identifier for your plugin.
@@ -50,6 +52,17 @@ class CTLT_Invite_User {
 	 * @var      object
 	 */
 	protected static $instance = null;
+	
+	
+	/**
+	 * rewrite_on
+	 * 
+	 * (default value: false)
+	 * Tells us if we have a rewrite rules enabled on the site or not
+	 * @since    1.0.0
+	 * @access protected
+	 */
+	protected static $rewrite_on = false;
 
 	/**
 	 * Initialize the plugin by setting localization and loading public scripts
@@ -64,57 +77,54 @@ class CTLT_Invite_User {
 		
 		if( in_array( get_site_option( 'registration' ), array( 'all', 'user' ) ) ) {
 			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-			add_action( 'setup_theme', array( $this, 'check_invite' ), 1  ); #
+			add_action( 'init', array( $this, 'add_rewrite' ), 1  ); #
+			add_action( 'template_redirect', array( $this, 'check_invite' ), 1  ); #
+			
+			
 		}
-		
-		# debug 
-		
-		
+				
 		
 	}
 	
-	/**
-	 * depricated_start function.
-	 * This finction exits because of the old plugin that used to be here
-	 * @access public
-	 * @return void
-	 */
-	public function depricated_start() {
-		// basically 
-		if( isset( $_GET['invitation'] ) ){
-			
-			$invite_api = CTLT_Invitation_API::get_instance();
-			
-			$hash = $invite_api->get_invite_by( 'hash', $_GET['invitation'], "ANY-BLOG" );
-			
-			if( !empty( $hash ) ){
-				$url = get_site_url( $hash['blog_id'] );
-				
-				// redirect to the propre place.
-				wp_redirect( $url."?action=invite_me&hash=".$hash['hash'] );
-				die();
-			}
-			
-			return;
-		}
-		return;
+	public function add_rewrite(){
+		$permalink_structure = get_option( 'permalink_structure' );
+		$this->rewrite_on = ( empty( $permalink_structure ) ? false : true );
+		
+		add_rewrite_rule( '^invite/([^/]*)/([^/]*)/?','index.php?invite_hash=$matches[1]&invite_action=$matches[2]','top' );
+    	add_rewrite_tag( '%invite_hash%','([^&]+)' );
+    	add_rewrite_tag( '%invite_action%','([^&]+)' );
+	
 	}
-
+	
+	
+	
 	/**
 	 * Delegates what happends when the user click on the invite url. 
 	 * Invites url can be found in emails, entered manually, or clicked on dashboard.
 	 * @return [type]
 	 */
 	public function check_invite(){
-		$redirect_url = false;
+		
+		global $wp_rewrite;
+		
+		$get_invite_hash 	= ( isset( $_GET['invite_hash'] ) ? $_GET['invite_hash'] : false );
+		$get_invite_action 	= ( isset( $_GET['invite_action'] ) ? $_GET['iinvite_action'] : false );
+		
+		$hash_id = (  $this->rewrite_on ? get_query_var( 'invite_hash' ) : $get_invite_hash  );
+		
+		$action = (  $this->rewrite_on ? get_query_var( 'invite_action' ) : $get_invite_action );
 		
 		# doesn't pass the first check
-		if( ! ( isset( $_GET['action'] ) && in_array( $_GET['action'], array( 'decline_invite', 'invite_me' ) ) && isset( $_GET['hash'] ) ) ){
+		if( ! ( in_array( $action, array( 'decline_invite', 'invite_me' ) ) && $hash_id ) ){
 			$this->depricated_start();
 			return;	
 		}
-			
+		
+		# add the don't cache thing here so that supercache doesn't even cache this page.
+		define( 'DONOTCACHEPAGE', 1 ); 
+		
 		$privacy = get_option( 'blog_public' );
+		
 		$site_url = site_url();
 		$site_dash = admin_url();
 		$site_name = get_bloginfo( 'name' );
@@ -122,9 +132,10 @@ class CTLT_Invite_User {
 		# hash is valid 
 		$invite_api = CTLT_Invitation_API::get_instance();
 		
-		$hash = $invite_api->get_invite_by( 'hash', $_GET['hash'], "ANY" );
+		$hash = $invite_api->get_invite_by( 'hash', $hash_id, "ANY" );
 		
 		$end_menu = "<p>Continue to the <a href='".$site_url."'>Site</a> or <a href='".$site_dash."'>Dashboard</a>.</p>";
+		
 		
 		if( $privacy < 0 )
 			$end_private = "";
@@ -171,7 +182,7 @@ class CTLT_Invite_User {
 			} else {
 				
 				
-				switch( $_GET['action'] ){
+				switch( $action ){
 				
 					case 'invite_me':
 						
@@ -202,9 +213,59 @@ class CTLT_Invite_User {
 		} else {
 			
 			# user needs to login first before we can add them
-			wp_redirect( wp_login_url( site_url( '?action=invite_me&hash='.$_GET['hash'] ) ) );
+			wp_redirect( wp_login_url( self::invite_url( $hash_id, 'invite_me' ) ) );
 		}
 			
+	}
+	
+	/**
+	 * depricated_start function.
+	 * This finction exits because of the old plugin that used to be here
+	 * @access public
+	 * @return void
+	 */
+	public function depricated_start() {
+		
+		// basically 
+		if( isset( $_GET['invitation'] ) ){
+			
+			$invite_api = CTLT_Invitation_API::get_instance();
+			
+			$hash = $invite_api->get_invite_by( 'hash', $_GET['invitation'], "ANY-BLOG" );
+			
+			if( !empty( $hash ) ){
+				$url = get_site_url( $hash['blog_id'] );
+				
+				// redirect to the propre place.
+				wp_redirect( self::invite_url( $hash['hash'], 'invite_me', $url ) );
+				die();
+			}
+			
+			return;
+		}
+		return;
+	}
+	
+	/**
+	 * invite_url function.
+	 * 
+	 * @access public
+	 * @static
+	 * @param mixed $hash
+	 * @param string $action (default: 'invite_me')
+	 * @param mixed $url (default: null)
+	 * @return void
+	 */
+	public static function invite_url( $hash, $action = 'invite_me', $url = null ){
+		
+		if( empty( $hash) )
+			return false;
+		
+		if( empty( $url ) )
+			$url = site_url();
+		
+		return $url.'/invite/'.$hash."/".$action;
+	
 	}
 	
 	/**

@@ -109,12 +109,12 @@ class CTLT_Invite_User_Admin {
 		foreach( $this->my_invites as $invite ){
 			echo "<div style='border-top:1px solid #EEE; margin:10px -12px 0; padding:0 12px;'><p>";
 			switch_to_blog( $invite['blog_id'] );
-			$site_url = site_url();
-			$join_url 	 = $site_url.'?action=invite_me&hash='.$invite['hash'];
-			$decline_url = $site_url.'?action=decline_invite&hash='.$invite['hash'];
+				$site_url = site_url();
+				$join_url 	 = CTLT_Invite_User::invite_url( $invite['hash'], 'invite_me'); 
+				$decline_url = CTLT_Invite_User::invite_url( $invite['hash'], 'decline_invite'); 
 			
-			echo "<strong><a href='".$site_url."'>".get_bloginfo( 'name' )."</strong></a> as <em>".$invite['role']."</em></p>" ; 
-			echo "<p><a href='".$join_url."' class='button button-primary'>Accept Invite</a> or <a href='".$decline_url."' >Decline</a>";
+				echo "<strong><a href='".$site_url."'>".get_bloginfo( 'name' )."</strong></a> as <em>".$invite['role']."</em></p>" ; 
+				echo "<p><a href='".$join_url."' class='button button-primary'>Accept Invite</a> or <a href='".$decline_url."' >Decline</a>";
 			
 			restore_current_blog();
 			
@@ -143,6 +143,8 @@ class CTLT_Invite_User_Admin {
 
 		return self::$instance;
 	}
+	
+	
 
 	/**
 	 * Register and enqueue admin-specific style sheet.
@@ -307,10 +309,13 @@ class CTLT_Invite_User_Admin {
 		$hash = $invite_api->generate_hash();
 
 		$role = $this->check_role( $raw_role );
+		
 		$invited_by_user = wp_get_current_user();
 		$invited_by = $invited_by_user->display_name;
 		
-		$message = $this->construct_email( $raw_message, $invited_by, $role, $hash );
+		$admin_message = get_site_option(  'ctlt_invite_email' );
+		
+		$message = $this->construct_email( $raw_message, $admin_message, $invited_by, $role, $hash );
 		
 		# construct email 
 		$emails = $this->find_emails( $raw_emails );
@@ -505,7 +510,7 @@ class CTLT_Invite_User_Admin {
 		    'p'	=> array()
 		);
 		# load the template
-		$user_message = wp_kses( nl2br( $raw_message ) ,  $allows_html );
+		$user_message = wp_kses( nl2br(  wp_unslash( $raw_message ) ) ,  $allows_html );
 		$admin_message = wp_kses( nl2br( $raw_admin_message ),  $allows_html );
 		
 		$template  = file_get_contents( realpath( dirname(__FILE__) ).'/views/email.html', true );
@@ -519,7 +524,7 @@ class CTLT_Invite_User_Admin {
 			'%blog_name%' 		=> $blog_name,
 			'%role_permission%' => $this->role_permission_text( $role ),
 			'%user_message%' 	=> $user_message,
-			'%invitation_url%' 	=> site_url().'?action=invite_me&hash='.$hash,
+			'%invitation_url%' 	=> CTLT_Invite_User::invite_url( $hash, 'invite_me'),
 			'%admin_message%'	=> $admin_message
 			);
 		# replace strings. 
