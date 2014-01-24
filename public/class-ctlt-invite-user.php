@@ -264,7 +264,7 @@ class CTLT_Invite_User {
 		if( empty( $url ) )
 			$url = site_url();
 		
-		return $url.'/invite/'.$hash."/".$action;
+		return $url.'?invite_hash='.$hash."&invite_action=".$action;
 	
 	}
 	
