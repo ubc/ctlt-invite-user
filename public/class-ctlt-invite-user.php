@@ -187,8 +187,12 @@ class CTLT_Invite_User {
 					case 'invite_me':
 						
 						# add the user to blog with role
-						if( !empty( $accepted ) ) # don't readd the user if they click on the invite link again
-							add_user_to_blog( $blog_id, $c_user->ID, $hash['role'] );
+						if( empty( $accepted ) ){
+
+							# don't readd the user if they click on the invite link again
+							$result = add_user_to_blog( $blog_id, $c_user->ID, $hash['role'] );
+
+						}
 						
 						#update the invite db
 						$invite_api->update_status( $hash['hash'], 1 ); #accepted
@@ -211,7 +215,6 @@ class CTLT_Invite_User {
 			} // end of member not part of blog
 
 		} else {
-			
 			# user needs to login first before we can add them
 			wp_redirect( wp_login_url( self::invite_url( $hash_id, 'invite_me' ) ) );
 		}
