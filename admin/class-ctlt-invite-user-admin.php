@@ -288,7 +288,6 @@ class CTLT_Invite_User_Admin {
 	public function invite_emails( $raw_emails, $raw_message, $raw_role ) {
 		
 		$invite_api = CTLT_Invitation_API::get_instance();
-		$hash = $invite_api->generate_hash();
 
 		$role = $this->check_role( $raw_role );
 		
@@ -296,8 +295,6 @@ class CTLT_Invite_User_Admin {
 		$invited_by = $invited_by_user->display_name;
 		
 		$admin_message = get_site_option(  'ctlt_invite_email' );
-		
-		$message = $this->construct_email( $raw_message, $admin_message, $invited_by, $role, $hash );
 		
 		# construct email 
 		$emails = $this->find_emails( $raw_emails );
@@ -307,7 +304,13 @@ class CTLT_Invite_User_Admin {
 		$send_emails = array();
 		$html_notice = '';
 		
-		foreach( $emails  as $email){
+		foreach( $emails as $email){
+
+			// Generate a new hash for each user
+			$hash = $invite_api->generate_hash();
+
+			$message = $this->construct_email( $raw_message, $admin_message, $invited_by, $role, $hash );
+
 			#checks if the user exists already or if the user was invited already as well. 
 			$check_email = $this->check_email( $email, $role ); 
 
@@ -315,7 +318,7 @@ class CTLT_Invite_User_Admin {
 				
 				# add the invitation to the db
 				$invite_api->insert_invite( $email, get_current_blog_id(), get_current_user_id(), $role, 0, $hash );
-				$send_emails[] = $email;
+				$send_emails[$email] = array( 'to' => $email, 'message' => $message );
 				
 			} else {
 				$notices[] = $check_email;
@@ -325,12 +328,18 @@ class CTLT_Invite_User_Admin {
 			# send email
 			$subject = $this->get_email_subject( $invited_by, $role, get_bloginfo( 'name' ) );
 			
-			add_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
-			# send email 
-			wp_mail( $send_emails, $subject, $message );
-			remove_filter ( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+			foreach( $send_emails as $key => $toAndMessage ){
+				
+				add_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+				
+				# send email 
+				wp_mail( $toAndMessage['to'], $subject, $toAndMessage['message'] );
+				
+				remove_filter ( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
 
-			$html_notice = '<div class="updated below-h2"><p> Just invited <strong>'.implode(", ", $send_emails )."</strong> to join .</p></div>";
+			}
+
+			$html_notice = '<div class="updated below-h2"><p> Just invited <strong>'.implode(", ", array_keys( $send_emails ) )."</strong> to join .</p></div>";
 		}
 		
 		if( !empty( $notices ) ) {
