@@ -256,7 +256,7 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
             }
 
             // singular 
-            if(  wp_verify_nonce( $_REQUEST['nonce'], 'delete_invite'  ) ) {
+            if(  isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], 'delete_invite'  ) ) {
                 $invites_api = CTLT_Invitation_API::get_instance();
                 $data = $invites_api->delete_invite( $_REQUEST['invite'] );
             } 
