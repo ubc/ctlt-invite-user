@@ -78,7 +78,7 @@
 			<tr valign="top">
 				<th scope="row"></th>
 				<td >
-					<input class="button-primary" type="submit" name="Example" value="<?php _e( 'Send Invitaions', 'ctlt-invite-user-locale' ); ?>" />
+					<input class="button-primary" type="submit" name="Example" value="<?php _e( 'Send Invitation(s)', 'ctlt-invite-user-locale' ); ?>" />
 				</td>
 			</tr>
 		</tbody>
