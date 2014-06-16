@@ -265,7 +265,7 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
 
         if( 'resend' === $this->current_action() ) {
 
-            if( wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural']  ) ){
+            if( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural']  ) ){
                 $invites_admin = CTLT_Invite_User_Admin::get_instance();
                 $data = $invites_admin->resend_invites( $_REQUEST['invite'] );
             }
