@@ -448,12 +448,13 @@ class CTLT_Invite_User_Admin {
 		// check if the user is already member of the blog
 			# don't email them. notify the admin that they are already part of their blog.
 		$user = get_user_by( 'email', $email );
-		if( function_exists( 'is_multisite' ) && is_multisite() ){
-			if( $user->ID && is_user_member_of_blog( $user->ID, get_current_blog_id() ) ) // 
+		if( $user && function_exists( 'is_multisite' ) && is_multisite() ){
+			if( $user->ID && is_user_member_of_blog( $user->ID, get_current_blog_id() ) ){
 				return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
+			}
 		} else {
 			
-			if( $user->ID )
+			if( $user && isset( $user->ID ) )
 				return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
 		}
 		if( $skip_db_check )
@@ -463,8 +464,9 @@ class CTLT_Invite_User_Admin {
 		$invite_api = CTLT_Invitation_API::get_instance();
 		$invite = $invite_api->get_invite_by( 'email', $email, 'ANY' );
 		
-		if( $invite )
+		if( $invite ){
 			return  "<strong>".$email ."</strong> already has an invitation.";
+		}
 
 		return "pass";
 
@@ -610,7 +612,7 @@ class CTLT_Invite_User_Admin {
 			$found_email = null;
 			$email = trim($email);
 			preg_match('/<(.*?)>/', $email, $find_email);
-			$found_email = $find_email[1];
+			$found_email = ( isset( $find_email[1] ) ) ? $find_email[1] : false;
   			
 			if( isset( $found_email ) && filter_var(  $found_email, FILTER_VALIDATE_EMAIL) && !in_array( $found_email, $emails)){
 				$emails[] = $found_email;

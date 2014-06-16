@@ -250,7 +250,7 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
         //Detect when a bulk action is being triggered...
         if( 'delete'=== $this->current_action() ) {
             
-            if( wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural']  ) ){
+            if( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $this->_args['plural']  ) ){
                 $invites_api = CTLT_Invitation_API::get_instance();
                 $data = $invites_api->delete_invites( $_REQUEST['invite'] );
             }
