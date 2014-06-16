@@ -344,8 +344,13 @@ class CTLT_Invitation_List_Table extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
+
+        // IF they're set in the request. use them, alternatively revert to defaults
+        $requestOrderby = ( isset( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : false;
+        $requestOrder = ( isset( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : false;
+
         $invites_api = CTLT_Invitation_API::get_instance();
-        $data = $invites_api->get_invites( $_REQUEST['orderby'], $_REQUEST['order'] );
+        $data = $invites_api->get_invites( $requestOrderby, $requestOrder );
         
         /**
          * REQUIRED for pagination. Let's figure out what page the user is currently 

@@ -270,7 +270,7 @@ class CTLT_Invitation_API{
      * @access public
      * @return void
      */
-    public function install()
+    static public function install()
     {
         global $wpdb;
         $installed_ver = get_site_option( "ubc_invitation_db_version" );
