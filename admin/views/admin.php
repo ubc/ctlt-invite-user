@@ -33,7 +33,7 @@
 				<td>
 					<fieldset><legend class="screen-reader-text"><span>Email Addresses', 'ctlt-invite-user-locale' ); ?></span></legend>
 					<textarea id="" name="emails" cols="80" rows="3" class="large-text" placeholder="name@example.com, buddy@example.com"></textarea>
-					<span class="description"><?php _e( 'Enter up to 20 email addresses speperated by commas.', 'ctlt-invite-user-locale' ); ?> </span>
+					<span class="description"><?php _e( 'Enter up to 20 email addresses separated by commas.', 'ctlt-invite-user-locale' ); ?> </span>
 					</fieldset>
 				</td>
 			</tr>
