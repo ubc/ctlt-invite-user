@@ -88,7 +88,7 @@ class CTLT_Invitation_API{
      * @param  int $status
      * @return array  
      */
-	public function get_invites_by( $type = 'hash', $value, $status=self::STATUS_WAITING ) {
+	static public function get_invites_by( $type = 'hash', $value, $status=self::STATUS_WAITING ) {
 		global $wpdb;
 		
 		$type = (  in_array( $type, self::$instance->get_db_columns() ) ? $type : "hash" );
@@ -108,7 +108,7 @@ class CTLT_Invitation_API{
 	 * @param   string $order
 	 * 
 	 */
-	public function get_invites( $order_by = 'timestamp' , $order = 'DESC' ){
+	static public function get_invites( $order_by = 'timestamp' , $order = 'DESC' ){
 		
 		global $wpdb;
 		$order = strtoupper( $order );

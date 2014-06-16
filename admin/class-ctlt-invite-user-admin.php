@@ -27,7 +27,7 @@ class CTLT_Invite_User_Admin {
 	 */
 	protected static $instance = null;
 	
-	protected static $my_invites = null;
+	protected $my_invites = null;
 	/**
 	 * Slug of the plugin screen.
 	 *
