@@ -62,7 +62,7 @@ class CTLT_Invite_User {
 	 * @since    1.0.0
 	 * @access protected
 	 */
-	protected static $rewrite_on = false;
+	protected $rewrite_on = false;
 
 	/**
 	 * Initialize the plugin by setting localization and loading public scripts
@@ -108,7 +108,7 @@ class CTLT_Invite_User {
 		global $wp_rewrite;
 		
 		$get_invite_hash 	= ( isset( $_GET['invite_hash'] ) ? $_GET['invite_hash'] : false );
-		$get_invite_action 	= ( isset( $_GET['invite_action'] ) ? $_GET['iinvite_action'] : false );
+		$get_invite_action 	= ( isset( $_GET['invite_action'] ) ? $_GET['invite_action'] : false );
 		
 		$hash_id = (  $this->rewrite_on ? get_query_var( 'invite_hash' ) : $get_invite_hash  );
 		
@@ -195,7 +195,7 @@ class CTLT_Invite_User {
 						
 						#message 
 						$this->wp_die( $accepted. "<p><big>Welcome ".$c_user->display_name."</big>
-				<br />You have been just joined to <strong><a href='".$site_url."'>".$site_name."</a></strong> as ".$hash['role'].".</p>".$end_menu  , 'Joined '.$site_name); 
+				<br />You have just joined <strong><a href='".$site_url."'>".$site_name."</a></strong> as ".$hash['role'].".</p>".$end_menu  , 'Joined '.$site_name); 
 						
 						
 					break;
