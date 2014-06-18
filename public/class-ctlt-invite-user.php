@@ -82,6 +82,8 @@ class CTLT_Invite_User {
 			
 			
 		}
+
+		add_filter( 'ctlt_invite_user_invite_hash', array( $this, 'ctlt_invite_user_invite_hash' ) );
 				
 		
 	}
@@ -107,21 +109,23 @@ class CTLT_Invite_User {
 		
 		global $wp_rewrite;
 		
-		$get_invite_hash 	= ( isset( $_GET['invite_hash'] ) ? $_GET['invite_hash'] : false );
-		$get_invite_action 	= ( isset( $_GET['invite_action'] ) ? $_GET['invite_action'] : false );
+		$get_invite_hash 	= ( isset( $_GET['invite_hash'] ) ? sanitize_text_field( $_GET['invite_hash'] ) : false );
+		$get_invite_action 	= ( isset( $_GET['invite_action'] ) ? sanitize_text_field( $_GET['invite_action'] ) : 'invite_me' );
 		
-		$hash_id = (  $this->rewrite_on ? get_query_var( 'invite_hash' ) : $get_invite_hash  );
+		$hash_id = ( $this->rewrite_on && get_query_var( 'invite_hash' ) != '' ) ? get_query_var( 'invite_hash' ) : $get_invite_hash;
 		
-		$action = (  $this->rewrite_on ? get_query_var( 'invite_action' ) : $get_invite_action );
-		
+		$action = ( $this->rewrite_on && get_query_var( 'invite_action' ) != '' ) ? get_query_var( 'invite_action' ) : $get_invite_action;
 		# doesn't pass the first check
 		if( ! ( in_array( $action, array( 'decline_invite', 'invite_me' ) ) && $hash_id ) ){
 			$this->depricated_start();
 			return;	
 		}
+
+		$hash_id = apply_filters( 'ctlt_invite_user_invite_hash', $hash_id );
+		$action = apply_filters( 'ctlt_invite_user_invite_action', $action );
 		
 		# add the don't cache thing here so that supercache doesn't even cache this page.
-		define( 'DONOTCACHEPAGE', 1 ); 
+		define( 'DONOTCACHEPAGE', 1 );
 		
 		$privacy = get_option( 'blog_public' );
 		
@@ -219,6 +223,24 @@ class CTLT_Invite_User {
 			wp_redirect( wp_login_url( self::invite_url( $hash_id, 'invite_me' ) ) );
 		}
 			
+	}
+
+	// CWL adds '?login' at the end of the url. Strip it
+	public function ctlt_invite_user_invite_hash( $hash ){
+
+		// Determine if end of hash is ?login
+		$endOfString = mb_substr( $hash, -6, 6 );
+
+		if( $endOfString !== '?login' ){
+			
+			return $hash;
+
+		}else{
+
+			return substr( $hash, 0, -6 );
+
+		}
+
 	}
 	
 	/**

@@ -1,9 +1,6 @@
 <?php
 /**
- * The WordPress Plugin Boilerplate.
- *
- * A foundation off of which to build well-documented WordPress plugins that
- * also follow WordPress Coding Standards and PHP best practices.
+ * A way to invite multiple users to your site at a time by their email address
  *
  * @package   CTLT_Invite_User
  * @author    Enej Bajgoric 
@@ -14,7 +11,7 @@
  * @wordpress-plugin
  * Plugin Name:       CTLT Invite Users
  * Plugin URI:        http://github.com/ubc/ctlt-invite-user
- * Description:       @TODO
+ * Description:       A way to invite multiple users to your site at a time by their email address
  * Version:           1.0.0
  * Author:            Enej Bajgoric
  * Author URI:        http://cms.ubc.ca
