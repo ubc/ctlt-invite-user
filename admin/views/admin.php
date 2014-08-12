@@ -23,6 +23,34 @@
 	   echo $notice;
 
 	}
+	$roles = get_editable_roles();
+	$usableRoles = array();
+	
+	if( $roles && is_array( $roles ) )
+	{
+
+		foreach( $roles as $role => $roleAtts )
+		{
+			
+			if( !in_array( $role, array_keys( $usableRoles ) ) ){
+				$usableRoles[$role] = $roleAtts['name'];
+			}
+
+		}
+
+	}
+	else
+	{
+		$usableRoles = array(
+			'administrator' 	=> 'Administrator',
+			'editor' 			=> 'Editor',
+			'author' 			=> 'Author',
+			'contributor' 		=> 'Contributor',
+			'subscriber' 		=> 'Subscriber'
+		);
+	}
+
+	$usableRoles = array_reverse( $usableRoles ); // We don't want Administrator first
 	?>
 	<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
 	<form action="" method="post">
@@ -42,11 +70,9 @@
 				<td>
 					<fieldset><legend class="screen-reader-text"><span>Role</span></legend>
 					<select name="role">
-						<option value="subscriber" >Subscriber - Viewer</option>
-						<option value="contributor" >Contributor</option>
-						<option value="author" >Author</option>
-						<option value="editor" >Editor</option>
-						<option value="administrator">Administrator</option>
+						<?php foreach( $usableRoles as $roleSlug => $roleName ){
+							echo '<option value="' . $roleSlug . '">' . $roleName . '</option>';
+						} ?>
 					</select>
 					</fieldset>
 				</td>

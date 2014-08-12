@@ -12,8 +12,8 @@
  * Plugin Name:       CTLT Invite Users
  * Plugin URI:        http://github.com/ubc/ctlt-invite-user
  * Description:       A way to invite multiple users to your site at a time by their email address
- * Version:           1.0.0
- * Author:            Enej Bajgoric
+ * Version:           1.0.1
+ * Author:            Enej Bajgoric, Richard Tape
  * Author URI:        http://cms.ubc.ca
  * Text Domain:       ctlt-invite-user-locale
  * License:           GPL-2.0+

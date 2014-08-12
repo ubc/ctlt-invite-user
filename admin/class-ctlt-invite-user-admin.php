@@ -438,7 +438,8 @@ class CTLT_Invite_User_Admin {
 	 */
 	public function check_role( $role ) {
 		
-		return ( in_array( $role, array( 'subscriber', 'contributor', 'author', 'editor', 'administrator' ) ) ? $role : 'subscriber');
+		$roles = get_editable_roles();
+		return ( in_array( $role, array_keys( $roles ) ) ? $role : 'subscriber' );
 	}
 
 	/**
