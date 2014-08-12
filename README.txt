@@ -1,10 +1,10 @@
 
-Contributors: enej, ubcdev, ctlt-dev
+Contributors: enej, ubcdev, ctlt-dev, iamfriendly
 Donate link: http://cms.ubc.ca/
-Tags: comments, spam
+Tags: users, invites
 Requires at least: 3.5.1
-Tested up to: 3.9.1
-Stable tag: 1.0.0
+Tested up to: 3.9.2
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
