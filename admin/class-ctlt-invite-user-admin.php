@@ -440,6 +440,7 @@ class CTLT_Invite_User_Admin {
 		
 		$roles = get_editable_roles();
 		return ( in_array( $role, array_keys( $roles ) ) ? $role : 'subscriber' );
+
 	}
 
 	/**
@@ -599,6 +600,10 @@ class CTLT_Invite_User_Admin {
 
 			case 'administrator':
 				return 'administrate';
+			break;
+
+			default:
+				return apply_filters( 'ctlt_invite_user_role_job_text', 'view', $role );
 			break;
 
 		}
