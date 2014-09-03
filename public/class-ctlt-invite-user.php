@@ -175,6 +175,18 @@ class CTLT_Invite_User {
 			
 			$c_user =  wp_get_current_user();
 			$blog_id = get_current_blog_id();
+
+			// Check that this invite is for this user
+			$inviteEmail 		= strtolower( $hash['email'] );
+			$thisUsersEmail 	= strtolower( $c_user->user_email );
+
+			if( !is_email( $inviteEmail ) || !is_email( $thisUsersEmail ) ){
+				$this->wp_die( "<p>Invalid email address.</p>" );
+			}
+
+			if( $inviteEmail != $thisUsersEmail ){
+				$this->wp_die( "<p>This invitation is not for your user. This could be because the email address attached to the invitation ( " . $inviteEmail . " ) is different from the email address attached to the user as whom you are logged in ( " . $thisUsersEmail . " ). You can <a href='" . admin_url( 'profile.php' ) . "' title=''>view your current profile</a> to see what your WordPress email address is.</p><p>You will either need to edit your WordPress email address to match the invitation or ask the person who sent the invitation to send another one to " . $thisUsersEmail . "</p>" );
+			}
 			
 			if( is_user_member_of_blog( $c_user->ID, $blog_id ) ) {
 				
