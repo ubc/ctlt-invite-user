@@ -31,7 +31,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Public-Facing Functionality
  *----------------------------------------------------------------------------*/
 
-define( 'CTLT_INVITE_USERS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+// define( 'CTLT_INVITE_USERS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'CTLT_INVITE_USERS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) . 'ctlt-invite-user/' );
 
 require_once( CTLT_INVITE_USERS_PLUGIN_PATH . 'public/class-ctlt-invite-user.php' );
 require_once( CTLT_INVITE_USERS_PLUGIN_PATH . 'includes/class-ctlt-invitation-api.php' );

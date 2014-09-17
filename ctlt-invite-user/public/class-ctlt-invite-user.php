@@ -79,6 +79,7 @@ class CTLT_Invite_User {
 			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 			add_action( 'init', array( $this, 'add_rewrite' ), 1  ); #
 			add_action( 'template_redirect', array( $this, 'check_invite' ), 1  ); #
+			add_action( 'admin_page_access_denied', array( $this, 'check_invite' ), 1  ); #
 			
 			
 		}

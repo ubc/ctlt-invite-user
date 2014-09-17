@@ -331,11 +331,16 @@ class CTLT_Invite_User_Admin {
 			foreach( $send_emails as $key => $toAndMessage ){
 				
 				add_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+
+				add_filter('wp_mail_from', array( $this, 'wp_mail_from__changeFromWordPressAddress' ) );
+				add_filter('wp_mail_from_name', array( $this, 'wp_mail_from_name__changeFromWordPress' ) );
 				
 				# send email 
 				wp_mail( $toAndMessage['to'], $subject, $toAndMessage['message'] );
 				
 				remove_filter ( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+				remove_filter ( 'wp_mail_from', array( $this, 'wp_mail_from__changeFromWordPressAddress' ) );
+				remove_filter ( 'wp_mail_from_name', array( $this, 'wp_mail_from_name__changeFromWordPress' ) );
 
 			}
 
@@ -356,6 +361,9 @@ class CTLT_Invite_User_Admin {
 	public function resend_invites( $invite ) {
 		
 		add_filter( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+		add_filter('wp_mail_from', array( $this, 'wp_mail_from__changeFromWordPressAddress' ) );
+		add_filter('wp_mail_from_name', array( $this, 'wp_mail_from_name__changeFromWordPress' ) );
+		
 		$notices = $error = $success = array();
 
 		if( is_array( $invite ) ){
@@ -367,6 +375,8 @@ class CTLT_Invite_User_Admin {
 		}
 
 		remove_filter ( 'wp_mail_content_type', array( $this, 'set_html_content_type' ) );
+		remove_filter ( 'wp_mail_from', array( $this, 'wp_mail_from__changeFromWordPressAddress' ) );
+		remove_filter ( 'wp_mail_from_name', array( $this, 'wp_mail_from_name__changeFromWordPress' ) );
 		
 		if( !empty( $notices ) ){
 			foreach( $notices as $notice ){
@@ -468,6 +478,12 @@ class CTLT_Invite_User_Admin {
 			if( $user && isset( $user->ID ) )
 				return  "<strong>".$email ."</strong> is already registed as <strong>".$user->display_name."</strong>.";
 		}
+
+		// Also check if a user actually exists in the user DB with this email
+		if( !email_exists( $email ) ){
+			return "<strong>No user exists with the email address: <span class='error-failed-email'>" . $email . "</span>. Please ask the user to register before inviting them. An invitation has not been sent to this email address.</strong>";
+		}
+
 		if( $skip_db_check )
 			return "pass";
 		// check if the user already has in invitation
@@ -686,5 +702,47 @@ class CTLT_Invite_User_Admin {
 	public function set_html_content_type() {
 		return 'text/html';
 	}
+
+
+	/**
+	 * Adjust the default email address the invite is sent from
+	 *
+	 * @since 0.1
+	 *
+	 * @param string $param description
+	 * @return string|int returnDescription
+	 */
+
+	public function wp_mail_from__changeFromWordPressAddress( $old )
+	{
+
+		$currentUser = wp_get_current_user();
+
+		if( !($current_user instanceof WP_User) ){
+			return get_option( 'admin_email' );
+		}
+
+		return apply_filters( 'ctlt_user_invite_email_from_address', $current_user->user_email );
+
+	}/* wp_mail_from__changeFromWordPressAddress() */
+
+
+	/**
+	 * Adjust the 'name' of the email sent for the invite
+	 *
+	 *
+	 * @since 0.1
+	 *
+	 * @param string $param description
+	 * @return string|int returnDescription
+	 */
+	public function wp_mail_from_name__changeFromWordPress( $old )
+	{
+
+		return apply_filters( 'ctlt_user_invite_email_from_name', get_option( 'blogname' ) );
+
+	}/* wp_mail_from_name__changeFromWordPress() */
+
+
 
 }
